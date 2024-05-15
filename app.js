@@ -27,6 +27,7 @@ const predictionsRouter = require('./routes/predictions');
 const commentsRouter = require('./routes/comments')
 
 const app = express();
+const port = process.env.PORT || 5000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
