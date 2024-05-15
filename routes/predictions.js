@@ -102,15 +102,15 @@ router.get('/getByCategory/:category', async (req, res) => {
 })
 
 //deletes ALL predictions!!!!//
-router.delete('/deleteAll', async (req, res) => {
-	try {
-		const data = await PredictionModel.deleteMany({})
-		res.json(data)
-	}
-	catch (error) {
-		res.status(500).json({ message: error.message })
-	}
-})
+// router.delete('/deleteAll', async (req, res) => {
+// 	try {
+// 		const data = await PredictionModel.deleteMany({})
+// 		res.json(data)
+// 	}
+// 	catch (error) {
+// 		res.status(500).json({ message: error.message })
+// 	}
+// })
 
 //post a new prediction
 router.post('/post', isLoggedIn, async (req, res) => {

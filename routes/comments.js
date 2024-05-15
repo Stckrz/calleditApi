@@ -15,15 +15,15 @@ router.get('/getAll', async (req, res) => {
 	}
 })
 //
-router.delete('/deleteAll', async (req, res) => {
-	try {
-		const comments = await CommentModel.deleteMany({})
-		res.json(comments)
-	}
-	catch (error) {
-		res.status(400).json({ message: error.message })
-	}
-})
+// router.delete('/deleteAll', async (req, res) => {
+// 	try {
+// 		const comments = await CommentModel.deleteMany({})
+// 		res.json(comments)
+// 	}
+// 	catch (error) {
+// 		res.status(400).json({ message: error.message })
+// 	}
+// })
 
 
 router.get('/getByPredictionId/:id', async (req, res) => {
