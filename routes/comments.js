@@ -16,6 +16,17 @@ router.get('/getOne/:id', async (req, res) => {
 	}
 })
 
+router.delete('/deleteOne/:id', async (req, res) => {
+	const id = req.params.id;
+	try{
+		const comment = await CommentModel.findByIdAndDelete(id)
+		res.json(comment)
+	}
+	catch (error) {
+		res.status(400).json({ message: error.message})
+	}
+})
+
 
 router.get('/getAll', async (req, res) => {
 	try {

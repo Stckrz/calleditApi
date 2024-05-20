@@ -19,6 +19,17 @@ router.get('/getAll', async (req, res) => {
 	}
 })
 
+router.delete('/deleteOne/:id', async (req, res) => {
+	const id = req.params.id;
+	try{
+		const user = await UserModel.findByIdAndDelete(id)
+		res.json(user)
+	}
+	catch (error) {
+		res.status(400).json({ message: error.message})
+	}
+})
+
 //returns info about a user by username
 router.get('/find/:username', async (req, res) => {
 	username = req.params.username
