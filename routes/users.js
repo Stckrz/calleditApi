@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { isLoggedIn } = require("../middleware/middleware");
 
 const { SECRET = 'secret' } = process.env
 
@@ -19,14 +20,31 @@ router.get('/getAll', async (req, res) => {
 	}
 })
 
-router.delete('/deleteOne/:id', async (req, res) => {
+router.delete('/deleteOne/:id', isLoggedIn, async (req, res) => {
+	const { username } = req.user;
+	req.body.username = username;
 	const id = req.params.id;
-	try{
-		const user = await UserModel.findByIdAndDelete(id)
-		res.json(user)
+	try {
+		const user = await UserModel.find({ username: username })
+		if (user) {
+			console.log(user[0].roles)
+			if (user[0].roles.includes("admin")) {
+				try {
+					const userToDelete = await UserModel.findByIdAndDelete(id)
+					res.json(userToDelete)
+				}
+				catch (error) {
+					res.status(400).json({ message: error.message })
+				}
+			}else{
+				res.status(400).json({message: "not allowed"})
+			}
+		} else {
+			res.status(400).json({ message: "no user found" })
+		}
 	}
 	catch (error) {
-		res.status(400).json({ message: error.message})
+		res.status(500).json({ message: error.message })
 	}
 })
 

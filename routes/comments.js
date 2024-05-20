@@ -4,6 +4,7 @@ var router = express.Router();
 const { isLoggedIn } = require("../middleware/middleware");
 
 const CommentModel = require('../models/comments')
+const UserModel = require('../models/user')
 
 router.get('/getOne/:id', async (req, res) => {
 	const id = req.params.id;
@@ -16,17 +17,33 @@ router.get('/getOne/:id', async (req, res) => {
 	}
 })
 
-router.delete('/deleteOne/:id', async (req, res) => {
+router.delete('/deleteOne/:id', isLoggedIn, async (req, res) => {
+	const { username } = req.user;
+	req.body.username = username;
 	const id = req.params.id;
-	try{
-		const comment = await CommentModel.findByIdAndDelete(id)
-		res.json(comment)
+	try {
+		const user = await UserModel.find({ username: username })
+		if (user) {
+			console.log(user[0].roles)
+			if (user[0].roles.includes("admin")) {
+				try {
+					const comment = await CommentModel.findByIdAndDelete(id)
+					res.json(comment)
+				}
+				catch (error) {
+					res.status(400).json({ message: error.message })
+				}
+			}else{
+				res.status(400).json({message: "not allowed"})
+			}
+		} else {
+			res.status(400).json({ message: "no user found" })
+		}
 	}
 	catch (error) {
-		res.status(400).json({ message: error.message})
+		res.status(500).json({ message: error.message })
 	}
 })
-
 
 router.get('/getAll', async (req, res) => {
 	try {

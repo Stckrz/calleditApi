@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router()
 const PredictionModel = require('../models/prediction');
+const UserModel = require('../models/user');
 const { isLoggedIn } = require("../middleware/middleware");
 
 const pageHandler = (pageNumber) => {
@@ -25,14 +26,28 @@ router.get('/getAll', async (req, res) => {
 	}
 })
 
-router.delete('/deleteOne/:id', async (req, res) => {
+router.delete('/deleteOne/:id', isLoggedIn, async (req, res) => {
+	const { username } = req.user;
+	req.body.username = username;
 	const id = req.params.id;
-	try{
-		const prediction = await PredictionModel.findByIdAndDelete(id)
-		res.json(prediction)
+	try {
+		const user = await UserModel.find({ username: username })
+		if (user) {
+			if (user[0].roles.includes("admin")) {
+				try {
+					const prediction = await PredictionModel.findByIdAndDelete(id)
+					res.json(prediction)
+				}
+				catch (error) {
+					res.status(400).json({ message: "not allowed" })
+				}
+			}
+		}else{
+			res.status(400).json({message: "no user found"})
+		}
 	}
 	catch (error) {
-		res.status(400).json({ message: error.message})
+		res.status(500).json({ message: error.message })
 	}
 })
 
@@ -46,7 +61,7 @@ router.get('/getByUser/:username', async (req, res) => {
 	skip = (page - 1) * limit;
 
 	try {
-		const total = await PredictionModel.countDocuments({"author": username})
+		const total = await PredictionModel.countDocuments({ "author": username })
 		const data = await PredictionModel.find({ "author": username }).skip(skip).limit(limit).sort({ finished_on: -1 })
 		res.json({ data, total })
 	}
@@ -214,7 +229,7 @@ router.patch('/addComment/:id', isLoggedIn, async (req, res) => {
 	try {
 		const id = req.params.id;
 		const commentId = req.body.commentId;
-		const result = await PredictionModel.updateOne({_id: id}, {$push: {comments: commentId}})
+		const result = await PredictionModel.updateOne({ _id: id }, { $push: { comments: commentId } })
 		res.send(result)
 	}
 	catch (error) {
