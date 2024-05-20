@@ -94,7 +94,8 @@ router.post('/login', async (req, res) => {
 				res.json({
 					username: user.username,
 					id: user._id,
-					token
+					token,
+					roles: user.roles
 				})
 
 			} else {
