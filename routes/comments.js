@@ -5,6 +5,18 @@ const { isLoggedIn } = require("../middleware/middleware");
 
 const CommentModel = require('../models/comments')
 
+router.get('/getOne/:id', async (req, res) => {
+	const id = req.params.id;
+	try {
+		const comment = await CommentModel.findById(id)
+		res.json(comment)
+	}
+	catch (error) {
+		res.status(400).json({ message: error.message })
+	}
+})
+
+
 router.get('/getAll', async (req, res) => {
 	try {
 		const comments = await CommentModel.find()
@@ -106,17 +118,17 @@ router.patch('/update/:id', isLoggedIn, async (req, res) => {
 	}
 })
 
-router.patch('/addReplyToComment/:id', isLoggedIn, async (req, res)=>{
+router.patch('/addReplyToComment/:id', isLoggedIn, async (req, res) => {
 	const { username } = req.user;
 	req.body.username = username;
-	try{
+	try {
 		const id = req.params.id;
 		const commentReply = req.body
-		const result = await CommentModel.updateOne({_id: id}, {$push: {replies: commentId}})
+		const result = await CommentModel.updateOne({ _id: id }, { $push: { replies: commentId } })
 		res.send(result)
 	}
 	catch (error) {
-		res.status(400).json({message: error.message})
+		res.status(400).json({ message: error.message })
 	}
 })
 
