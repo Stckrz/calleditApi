@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router()
 const PredictionModel = require('../models/prediction');
+const CommentModel = require('../models/comments');
 const UserModel = require('../models/user');
 const { isLoggedIn } = require("../middleware/middleware");
 
@@ -26,6 +27,7 @@ router.get('/getAll', async (req, res) => {
 	}
 })
 
+//this is messy.. finds a prediction by id, then deletes all of its comments, then deletes the prediction. More erro handling is needed here.
 router.delete('/deleteOne/:id', isLoggedIn, async (req, res) => {
 	const { username } = req.user;
 	req.body.username = username;
@@ -35,8 +37,10 @@ router.delete('/deleteOne/:id', isLoggedIn, async (req, res) => {
 		if (user) {
 			if (user[0].roles.includes("admin")) {
 				try {
-					const prediction = await PredictionModel.findByIdAndDelete(id)
-					res.json(prediction)
+					const prediction = await PredictionModel.findById(id)
+					const comments = await CommentModel.deleteMany({'_id': {$in: prediction.comments}} )
+					const deletePrediction = await PredictionModel.findByIdAndDelete(id)
+					res.json({ comments: comments, prediction: deletePrediction})
 				}
 				catch (error) {
 					res.status(400).json({ message: "not allowed" })
