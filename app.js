@@ -42,7 +42,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/', rateLimiter);
+// app.use('/', rateLimiter);
 app.use('/users', usersRouter);
 app.use('/predictions', predictionsRouter);
 app.use('/comments', commentsRouter);
