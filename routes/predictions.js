@@ -42,8 +42,8 @@ router.delete('/deleteOne/:id', isLoggedIn, async (req, res) => {
 					res.status(400).json({ message: "not allowed" })
 				}
 			}
-		}else{
-			res.status(400).json({message: "no user found"})
+		} else {
+			res.status(400).json({ message: "no user found" })
 		}
 	}
 	catch (error) {

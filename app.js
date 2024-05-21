@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { rateLimiter } = require("./middleware/rateLimiter")
 
 const createError = require('http-errors');
 const express = require('express');
@@ -41,9 +42,11 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/', rateLimiter);
 app.use('/users', usersRouter);
 app.use('/predictions', predictionsRouter);
 app.use('/comments', commentsRouter);
+
 
 
 // catch 404 and forward to error handler
